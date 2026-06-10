@@ -1,18 +1,34 @@
 name: Deploy
 
 on:
+  push:
+    branches:
+      - main
+
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-dotnet@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Restore
         run: dotnet restore
@@ -20,6 +36,11 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-      - name: Package
+      - name: Install Lambda Tools
+        run: dotnet tool install -g Amazon.Lambda.Tools
+
+      - name: Deploy Lambda
+        working-directory: src/UrlShortener.Api
         run: |
-          dotnet tool install -g Amazon.Lambda.Tools
+          dotnet lambda deploy-function url-shortener-api \
+            --configuration Release

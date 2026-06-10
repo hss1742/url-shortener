@@ -23,6 +23,10 @@ API Gateway (HTTP API)
 AWS Lambda (.NET 8)
   ↓
 Response
+
+Future:
+  ↓
+DynamoDB
 ```
 
 ### Health Endpoint
@@ -39,75 +43,33 @@ URL Shortener API is healthy
 
 ---
 
-## Project Structure
+## CI/CD Architecture
 
 ```text
-url-shortener/
-│
-├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── deploy.yml
-│
-├── src/
-│   └── UrlShortener.Api/
-│
-├── UrlShortener.sln
-├── README.md
-└── .gitignore
+Developer
+    ↓
+git push
+    ↓
+GitHub Actions
+    ↓
+OIDC Authentication
+    ↓
+AWS IAM Role
+    ↓
+AWS Lambda Deployment
+    ↓
+API Gateway
+    ↓
+Live Endpoint Updated
 ```
 
----
+### Authentication
 
-## Development Setup
+GitHub Actions authenticates to AWS using OpenID Connect (OIDC).
 
-### Prerequisites
+No long-lived AWS access keys are stored in GitHub Secrets.
 
-* .NET 8 SDK
-* AWS CLI
-* Amazon Lambda Tools
-
-Install Lambda Tools:
-
-```bash
-dotnet tool install -g Amazon.Lambda.Tools
-```
-
-Update Lambda Tools:
-
-```bash
-dotnet tool update -g Amazon.Lambda.Tools
-```
-
----
-
-## Build
-
-From the repository root:
-
-```bash
-dotnet restore
-dotnet build
-```
-
----
-
-## Run Tests
-
-```bash
-dotnet test
-```
-
----
-
-## Deploy Lambda
-
-Deploy the function to AWS:
-
-```bash
-cd src/UrlShortener.Api
-dotnet lambda deploy-function url-shortener-api
-```
+Temporary AWS credentials are issued by AWS STS during deployment.
 
 ---
 
@@ -118,29 +80,46 @@ dotnet lambda deploy-function url-shortener-api
 * AWS Lambda Function
 * API Gateway HTTP API
 * Lambda ↔ API Gateway Integration
-* CI Pipeline (GitHub Actions)
+* GitHub Actions CI Pipeline
+* GitHub Actions CD Pipeline
+* OIDC Authentication
+* IAM Deployment Role
+* Automated Lambda Deployment
 * Public Health Endpoint
 
 ### Planned
 
-* Automated CD Pipeline
 * Clean Architecture Layers
 * URL Creation Endpoint
+* URL Redirection Endpoint
 * Short Code Generation
 * DynamoDB Integration
 * Analytics Pipeline
+* Monitoring & Observability
 
 ---
 
-## Learning Goals
+## Deployment
 
-This project is being built incrementally to develop:
+Deployments are fully automated.
 
-* Backend Engineering Skills
-* AWS Serverless Architecture Skills
-* CI/CD Experience
-* Production System Design Skills
-* SDE2-Level Engineering Practices
-
+```text
+Code Change
+    ↓
+git push
+    ↓
+GitHub Actions
+    ↓
+Build
+    ↓
+Deploy Lambda
+    ↓
+Production Updated
 ```
+
+Manual deployment remains available:
+
+```bash
+cd src/UrlShortener.Api
+dotnet lambda deploy-function url-shortener-api
 ```

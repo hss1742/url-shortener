@@ -1,49 +1,146 @@
-# AWS Lambda Empty Function Project
+# URL Shortener
 
-This starter project consists of:
-* Function.cs - class file containing a class with a single function handler method
-* aws-lambda-tools-defaults.json - default argument settings for use with Visual Studio and command line deployment tools for AWS
+A production-style URL Shortener built using .NET 8 and AWS serverless services.
 
-You may also have a test project depending on the options selected.
+## Tech Stack
 
-The generated function handler is a simple method accepting a string argument that returns the uppercase equivalent of the input string. Replace the body of this method, and parameters, to suit your needs. 
+* .NET 8
+* AWS Lambda
+* API Gateway (HTTP API)
+* DynamoDB (planned)
+* GitHub Actions
+* Clean Architecture (planned)
 
-## Here are some steps to follow from Visual Studio:
+---
 
-To deploy your function to AWS Lambda, right click the project in Solution Explorer and select *Publish to AWS Lambda*.
+## Current Architecture
 
-To view your deployed function open its Function View window by double-clicking the function name shown beneath the AWS Lambda node in the AWS Explorer tree.
-
-To perform testing against your deployed function use the Test Invoke tab in the opened Function View window.
-
-To configure event sources for your deployed function, for example to have your function invoked when an object is created in an Amazon S3 bucket, use the Event Sources tab in the opened Function View window.
-
-To update the runtime configuration of your deployed function use the Configuration tab in the opened Function View window.
-
-To view execution logs of invocations of your function use the Logs tab in the opened Function View window.
-
-## Here are some steps to follow to get started from the command line:
-
-Once you have edited your template and code you can deploy your application using the [Amazon.Lambda.Tools Global Tool](https://github.com/aws/aws-extensions-for-dotnet-cli#aws-lambda-amazonlambdatools) from the command line.
-
-Install Amazon.Lambda.Tools Global Tools if not already installed.
-```
-    dotnet tool install -g Amazon.Lambda.Tools
+```text
+Client
+  ↓
+API Gateway (HTTP API)
+  ↓
+AWS Lambda (.NET 8)
+  ↓
+Response
 ```
 
-If already installed check if new version is available.
-```
-    dotnet tool update -g Amazon.Lambda.Tools
+### Health Endpoint
+
+```http
+GET /health
 ```
 
-Execute unit tests
-```
-    cd "UrlShortener.Api/test/UrlShortener.Api.Tests"
-    dotnet test
+Response:
+
+```text
+URL Shortener API is healthy
 ```
 
-Deploy function to AWS Lambda
+---
+
+## Project Structure
+
+```text
+url-shortener/
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+│
+├── src/
+│   └── UrlShortener.Api/
+│
+├── UrlShortener.sln
+├── README.md
+└── .gitignore
 ```
-    cd "UrlShortener.Api/src/UrlShortener.Api"
-    dotnet lambda deploy-function
+
+---
+
+## Development Setup
+
+### Prerequisites
+
+* .NET 8 SDK
+* AWS CLI
+* Amazon Lambda Tools
+
+Install Lambda Tools:
+
+```bash
+dotnet tool install -g Amazon.Lambda.Tools
+```
+
+Update Lambda Tools:
+
+```bash
+dotnet tool update -g Amazon.Lambda.Tools
+```
+
+---
+
+## Build
+
+From the repository root:
+
+```bash
+dotnet restore
+dotnet build
+```
+
+---
+
+## Run Tests
+
+```bash
+dotnet test
+```
+
+---
+
+## Deploy Lambda
+
+Deploy the function to AWS:
+
+```bash
+cd src/UrlShortener.Api
+dotnet lambda deploy-function url-shortener-api
+```
+
+---
+
+## Infrastructure Status
+
+### Completed
+
+* AWS Lambda Function
+* API Gateway HTTP API
+* Lambda ↔ API Gateway Integration
+* CI Pipeline (GitHub Actions)
+* Public Health Endpoint
+
+### Planned
+
+* Automated CD Pipeline
+* Clean Architecture Layers
+* URL Creation Endpoint
+* Short Code Generation
+* DynamoDB Integration
+* Analytics Pipeline
+
+---
+
+## Learning Goals
+
+This project is being built incrementally to develop:
+
+* Backend Engineering Skills
+* AWS Serverless Architecture Skills
+* CI/CD Experience
+* Production System Design Skills
+* SDE2-Level Engineering Practices
+
+```
 ```

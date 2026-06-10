@@ -15,7 +15,7 @@ public class Function
         return new APIGatewayProxyResponse
         {
             StatusCode = 200,
-            Body = "URL Shortener API is healthy"
+            Body = "URL Shortener API deployed from GitHub Actions"
         };
     }
 }

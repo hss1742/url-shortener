@@ -15,39 +15,37 @@ public class Function
 {
     private static readonly IServiceProvider ServiceProvider = ServiceProviderFactory.Create();
     
-    public async Task<APIGatewayProxyResponse> FunctionHandler(
-    APIGatewayProxyRequest request,
-    ILambdaContext context)
+    public async Task<APIGatewayHttpApiV2ProxyResponse> FunctionHandler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        context.Logger.LogInformation($" Request: {JsonSerializer.Serialize(request)} Method: {request.HttpMethod}, Path: {request.Path}");
+        context.Logger.LogInformation($" Request: {JsonSerializer.Serialize(request)}");
 
-        if (request.HttpMethod == "GET" && request.Path == "/health")
+        // if (request.HttpMethod == "GET" && request.Path == "/health")
+        // {
+        //     var healthService = ServiceProvider.GetRequiredService<HealthService>();
+        //     var response = healthService.GetHealth();
+
+        //     return new APIGatewayHttpApiV2ProxyResponse
+        //     {
+        //         StatusCode = 200,
+        //         Body = JsonSerializer.Serialize(response)
+        //     };
+        // }
+
+        // if (request.HttpMethod == "POST" && request.Path == "/shorten")
+        // {
+        //     var createRequest = JsonSerializer.Deserialize<Models.CreateShortUrlRequest>(request.Body);
+
+        //     return new APIGatewayHttpApiV2ProxyResponse
+        //     {
+        //         StatusCode = 200,
+        //         Body = createRequest?.Url ?? "No URL"
+        //     };
+        // }
+
+        return new APIGatewayHttpApiV2ProxyResponse
         {
-            var healthService = ServiceProvider.GetRequiredService<HealthService>();
-            var response = healthService.GetHealth();
-
-            return new APIGatewayProxyResponse
-            {
-                StatusCode = 200,
-                Body = JsonSerializer.Serialize(response)
-            };
-        }
-
-        if (request.HttpMethod == "POST" && request.Path == "/shorten")
-        {
-            var createRequest = JsonSerializer.Deserialize<Models.CreateShortUrlRequest>(request.Body);
-
-            return new APIGatewayProxyResponse
-            {
-                StatusCode = 200,
-                Body = createRequest?.Url ?? "No URL"
-            };
-        }
-
-        return new APIGatewayProxyResponse
-        {
-            StatusCode = 404,
-            Body = "Route not found"
+            StatusCode = 200,
+            Body = "V2 Request received"
         };
     }
 }

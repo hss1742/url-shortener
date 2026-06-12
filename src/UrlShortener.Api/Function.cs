@@ -19,6 +19,8 @@ public class Function
     APIGatewayProxyRequest request,
     ILambdaContext context)
     {
+        context.Logger.LogInformation($"Method: {request.HttpMethod}, Path: {request.Path}");
+
         if (request.HttpMethod == "GET" && request.Path == "/health")
         {
             var healthService = ServiceProvider.GetRequiredService<HealthService>();

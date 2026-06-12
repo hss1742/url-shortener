@@ -19,7 +19,7 @@ public class Function
     APIGatewayProxyRequest request,
     ILambdaContext context)
     {
-        context.Logger.LogInformation($"Method: {request.HttpMethod}, Path: {request.Path}");
+        context.Logger.LogInformation($" Request: {JsonSerializer.Serialize(request)} Method: {request.HttpMethod}, Path: {request.Path}");
 
         if (request.HttpMethod == "GET" && request.Path == "/health")
         {

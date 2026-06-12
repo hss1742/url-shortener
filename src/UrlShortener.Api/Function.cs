@@ -5,6 +5,7 @@ using Amazon.Lambda.Core;
 using UrlShortener.Application.Health;
 using Microsoft.Extensions.DependencyInjection;
 using UrlShortener.Api.DependencyInjection;
+using UrlShortener.Application.UseCases.CreateShortUrl;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -17,35 +18,42 @@ public class Function
     
     public async Task<APIGatewayHttpApiV2ProxyResponse> FunctionHandler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
     {
-        context.Logger.LogInformation($" Request: {JsonSerializer.Serialize(request)}");
+        var method = request.RequestContext.Http.Method;
+        var path = request.RawPath;
+        context.Logger.LogInformation($"Method: {method}, Path: {path}");
 
-        // if (request.HttpMethod == "GET" && request.Path == "/health")
-        // {
-        //     var healthService = ServiceProvider.GetRequiredService<HealthService>();
-        //     var response = healthService.GetHealth();
+        if (method == "GET" && path == "/health")
+        {
+            var healthService = ServiceProvider.GetRequiredService<HealthService>();
+            var response = healthService.GetHealth();
 
-        //     return new APIGatewayHttpApiV2ProxyResponse
-        //     {
-        //         StatusCode = 200,
-        //         Body = JsonSerializer.Serialize(response)
-        //     };
-        // }
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = 200,
+                Body = JsonSerializer.Serialize(response)
+            };
+        }
 
-        // if (request.HttpMethod == "POST" && request.Path == "/shorten")
-        // {
-        //     var createRequest = JsonSerializer.Deserialize<Models.CreateShortUrlRequest>(request.Body);
+        if (method == "POST" && path == "/shorten")
+        {
+            var createRequest = JsonSerializer.Deserialize<Models.CreateShortUrlRequest>(request.Body);
 
-        //     return new APIGatewayHttpApiV2ProxyResponse
-        //     {
-        //         StatusCode = 200,
-        //         Body = createRequest?.Url ?? "No URL"
-        //     };
-        // }
+            var handler = ServiceProvider.GetRequiredService<CreateShortUrlHandler>();
+
+            var response = await handler.HandleAsync(
+                new CreateShortUrlRequest(createRequest!.Url));
+
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = 200,
+                Body = JsonSerializer.Serialize(response)
+            };
+        }
 
         return new APIGatewayHttpApiV2ProxyResponse
         {
-            StatusCode = 200,
-            Body = "V2 Request received"
+            StatusCode = 404,
+            Body = "Router Not found."
         };
     }
 }

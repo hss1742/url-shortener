@@ -3,10 +3,13 @@ using UrlShortener.Domain.Entities;
 
 namespace UrlShortener.Infrastructure.Persistence;
 
-public class UrlRepository : IUrlRepository
+public sealed class InMemoryUrlRepository : IUrlRepository
 {
+    private readonly List<ShortUrl> _urls = [];
+
     public Task CreateAsync(ShortUrl shortUrl, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        _urls.Add(shortUrl);
+        return Task.CompletedTask;
     }
 }

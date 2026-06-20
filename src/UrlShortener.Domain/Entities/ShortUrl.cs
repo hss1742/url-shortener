@@ -37,4 +37,13 @@ public sealed class ShortUrl
             shortCode,
             DateTimeOffset.UtcNow);
     }
+
+    public static ShortUrl Rehydrate(Guid id, string originalUrl, string shortCode, DateTimeOffset createdAt)
+    {
+        return new ShortUrl(
+            id,
+            originalUrl,
+            shortCode,
+            createdAt);
+    }
 }

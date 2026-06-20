@@ -12,4 +12,9 @@ public sealed class InMemoryUrlRepository : IUrlRepository
         _urls.Add(shortUrl);
         return Task.CompletedTask;
     }
+
+    public Task<ShortUrl?> GetByShortCodeAsync(string shortCode, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }

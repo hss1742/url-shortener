@@ -33,4 +33,33 @@ public sealed class DynamoDbUrlRepository : IUrlRepository
         },
         cancellationToken);
     }
+
+    public async Task<ShortUrl?> GetByShortCodeAsync(string shortCode, CancellationToken cancellationToken)
+    {
+        var request = new GetItemRequest
+        {
+            TableName = _tableName,
+            Key = new Dictionary<string, AttributeValue>
+            {
+                ["ShortCode"] = new AttributeValue
+                {
+                    S = shortCode
+                }
+            }
+        };
+
+        var response = await _dynamoDb.GetItemAsync(request,cancellationToken);
+        if (response.Item.Count == 0)
+        {
+            return null;
+        }
+
+        var item = response.Item;
+        var id = Guid.Parse(item["Id"].S);
+        var originalUrl = item["OriginalUrl"].S!;
+        var storedShortCode = item["ShortCode"].S!;
+        var createdAt = DateTimeOffset.Parse(item["CreatedAt"].S!, null, System.Globalization.DateTimeStyles.RoundtripKind);
+
+        return ShortUrl.Rehydrate(id, originalUrl, storedShortCode, createdAt);
+    }
 }

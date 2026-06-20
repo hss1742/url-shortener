@@ -33,6 +33,17 @@ public class Function
             };
         }
 
+        if (method == "GET" && path != "/health")
+        {
+            var shortCode = path.Trim('/');
+
+            return new APIGatewayHttpApiV2ProxyResponse
+            {
+                StatusCode = 200,
+                Body = $"Short code: {shortCode}"
+            };
+        }
+
         if (method == "POST" && path == "/shorten")
         {
             var createRequest = JsonSerializer.Deserialize<Models.CreateShortUrlRequest>(request.Body);
